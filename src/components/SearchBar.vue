@@ -1,4 +1,4 @@
-
+<!-- 
 
 <template>
 
@@ -20,14 +20,6 @@ let userStrings = "rockman239";
 export default {
  name: 'SearchBar',
 
-
-
-// props: {
-
-//        finishedAiringAnimes: {
-//          type: Object
-//        }
-// },
 
  data (){
     return {
@@ -159,7 +151,7 @@ export default {
 
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+
 <style scoped>
 
-</style>
+</style> -->

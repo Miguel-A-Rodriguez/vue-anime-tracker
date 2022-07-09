@@ -1,7 +1,10 @@
 <template>
 
   <!-- Need to make this Currently Airing Anime conditional on such anime existing -->
-  <h1>Currently Airing</h1>
+  <!-- <h1 v-if="currentlyAiringAnimes === { }">Currently Airing</h1> -->
+
+ <h1 v-if="Object.keys(currentlyAiringAnimes).length > 0"> Currently Airing Anime</h1>
+
  <div id="component" class="currently-airing-container" v-for="(currentlyAiringAnime, index) in currentlyAiringAnimes" :key="index">
 
   <!-- <h1>{{currentlyAiringAnime.media.nextAiringEpisode.airingAt  ? "Currently Airing" : null}}</h1> -->
@@ -61,10 +64,11 @@ methods: {
 
   generateShortTitle(title){
     const newTitle = title.slice(0, 35).concat("...")
-    return newTitle
-  }
-  
 
+    return newTitle
+  },
+
+    
 },
 
 

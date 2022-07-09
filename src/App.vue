@@ -16,7 +16,15 @@
   <div class="header">
     <h3>Welcome {{userName}}</h3>
     Anime Schedule Tracker
-    <SearchBarVue />
+    <!-- <SearchBarVue /> -->
+
+
+    <h6>Enter a Username to look at the anime they are watching!</h6>
+    <form action="post" v-on:submit.prevent="fetchUserData">
+
+      <input type="text" v-model="searchUser">
+    </form>
+
   </div>
 
   <CurrentlyAiringVue :currentlyAiringAnimes="currentlyAiringAnimes"  />
@@ -29,11 +37,9 @@
 <script>
 import FinishedAiringVue from './components/FinishedAiring.vue';
 import CurrentlyAiringVue from './components/CurrentlyAiring.vue';
-import SearchBarVue from './components/SearchBar.vue';
+// import SearchBarVue from './components/SearchBar.vue';
 
-let variables = {
-    users: "rockman239"
-};
+
 
 let userStrings = "rockman239"
 
@@ -79,15 +85,17 @@ export default {
   components: {
    FinishedAiringVue,
    CurrentlyAiringVue,
-   SearchBarVue
+  //  SearchBarVue
   },
 
   data (){
     return {
 
       finishedAiringAnimes: null,
-      currentlyAiringAnimes: null,
-      userName: null
+      currentlyAiringAnimes: { },
+      userName: null,
+      searchUser: null,
+      searchData: null
     }
   },
 
@@ -102,7 +110,7 @@ export default {
           },
           body: JSON.stringify({
             query: query,
-            variables: variables
+           
            
             
       })
@@ -124,8 +132,9 @@ export default {
     handleData(data) {
      
 
-
+      console.log(data)
       const allAnimesArray = data.data.MediaListCollection.lists[0].entries;
+      
 
       // checks if the "nextAiringEpisode" is null and then populates the array with those animes i.e only returns animes that have finished airing
       const doneAiringAnime = allAnimesArray.filter(item => Boolean(!item.media.nextAiringEpisode));
@@ -140,13 +149,128 @@ export default {
       const names = data.data.MediaListCollection.user.name;
       this.userName = names
 
+
     },
 
      handleError(error) {
       alert('Error, check console');
       console.error(error);
-    }
+    },
+
+
+   // Fetch the dynamic user data in the input tag
+     fetchUserData() {
+
+      const url = 'https://graphql.anilist.co',
+      
+        options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+
+          body: JSON.stringify({
+
+            query: this.handleQueryUpdate(),
+
+           
+            
+      })
+      
+      }
+
+      fetch(url, options)
+      .then(this.handleUserResponse)
+      .then(this.handleUserData) 
+      .catch(this.handleUserError)
+    },
+  
+    
+    handleQueryUpdate() {
+        let dynamicInput = this.searchUser
+        userStrings = dynamicInput;
+
+        const userNames = `
+            {
+            MediaListCollection(userName: "${userStrings}", type: ANIME) {
+            
+            lists {
+            entries {
+                id
+                progress
+                media{
+                episodes
+                title {
+                english
+                romaji
+                }
+                coverImage {
+                    medium
+                    large
+                    color
+                }
+                nextAiringEpisode{
+                        airingAt
+                        }
+                siteUrl
+                }
+            }
+            }
+            user {
+            name
+            }
+
+            }
+
+            },
+            `;
+            return userNames
+    },
+
+     handleUserResponse(response) {
+      return response.json().then(function (json) {
+        return response.ok ? json : Promise.reject(json);
+      });
+    },
+
+    handleUserData(data) {
+      if (data.data.MediaListCollection.lists.length <= 0) return;
+     
+
+
+      const allAnimesArray = data.data.MediaListCollection.lists[0].entries;
+
+      this.searchData = allAnimesArray;
+
+      
+     // checks if the "nextAiringEpisode" is null and then populates the array with those animes i.e only returns animes that have finished airing
+      const doneAiringAnime = allAnimesArray.filter(item => Boolean(!item.media.nextAiringEpisode));
+      this.finishedAiringAnimes = doneAiringAnime;
+      
+ 
+    // checks if the "nextAiringEpisode" is true and then populates the array with those animes i.e only returns animes that are currently airing
+      const currentlyAiringAnime = allAnimesArray.filter(item => Boolean(item.media.nextAiringEpisode));
+      this.currentlyAiringAnimes = currentlyAiringAnime;
+      
+      const names = data.data.MediaListCollection.user.name;
+      this.userName = names
+
+      console.log(this.searchData)
+      console.log({userStrings})
+    },
+
+     handleUserError(error) {
+      alert(error.errors[0].message);
+      console.error(error);
+    },
+
+  //Fetch the dynamic user data in the input tag
+
   },
+
+
+
 
   mounted() {
     this.fetchMovieData();
@@ -173,11 +297,28 @@ export default {
 <style scoped>
   .header{
     text-align: left;
-    font-size: 5vw;
+    font-size: 3vw;
     background-color: #2b2d42;
     color: white;
     padding: 30px;
     margin-top: 0 !important;
     width: 100%;
+  }
+  h6{
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  /* search input  */
+  form{
+    height: auto;
+    max-height: 100px;
+    padding-bottom: 20px;
+  }
+  input {
+    width: 100%;
+    max-width: 700px;
+    min-height: 50px;
+    font-size: 24px;
   }
 </style>
