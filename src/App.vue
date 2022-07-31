@@ -1,3 +1,5 @@
+
+
 <template>
 
   <!-- // <FinishedAiringVue v-bind:usersData="usersData"/>
@@ -13,6 +15,8 @@
    //     }
   // } -->
 
+
+
   <div class="header">
     <h3>Welcome {{userName}}</h3>
     Anime Schedule Tracker
@@ -27,9 +31,12 @@
 
   </div>
 
-  <CurrentlyAiringVue :currentlyAiringAnimes="currentlyAiringAnimes"  />
-
+    <div v-if="loadingState">
+      <EpicSpinnersVue />
+    </div>
   
+  
+  <CurrentlyAiringVue :currentlyAiringAnimes="currentlyAiringAnimes"  />
   <FinishedAiringVue :finishedAiringAnimes="finishedAiringAnimes" />
   
 </template>
@@ -37,6 +44,9 @@
 <script>
 import FinishedAiringVue from './components/FinishedAiring.vue';
 import CurrentlyAiringVue from './components/CurrentlyAiring.vue';
+import EpicSpinnersVue from './components/EpicSpinners.vue';
+
+
 // import SearchBarVue from './components/SearchBar.vue';
 
 
@@ -85,12 +95,14 @@ export default {
   components: {
    FinishedAiringVue,
    CurrentlyAiringVue,
+   EpicSpinnersVue
+
   //  SearchBarVue
   },
 
   data (){
     return {
-
+      loadingState: true,
       finishedAiringAnimes: null,
       currentlyAiringAnimes: { },
       userName: null,
@@ -101,6 +113,7 @@ export default {
 
   methods: {
     fetchMovieData() {
+      
       const url = 'https://graphql.anilist.co',
         options = {
           method: 'POST',
@@ -118,19 +131,22 @@ export default {
 
       fetch(url, options)
       .then(this.handleResponse)
-      .then(this.handleData) 
+      .then(this.handleData)
+      .then(this.changeLoadingState) 
       .catch(this.handleError)
     },
   
 
      handleResponse(response) {
+       
       return response.json().then(function (json) {
+        
         return response.ok ? json : Promise.reject(json);
       });
     },
 
     handleData(data) {
-     
+  
 
       console.log(data)
       const allAnimesArray = data.data.MediaListCollection.lists[0].entries;
@@ -150,6 +166,10 @@ export default {
       this.userName = names
 
 
+    },
+
+    changeLoadingState(){
+      return this.loadingState = false;
     },
 
      handleError(error) {
@@ -237,7 +257,7 @@ export default {
     handleUserData(data) {
       if (data.data.MediaListCollection.lists.length <= 0) return;
      
-
+      
 
       const allAnimesArray = data.data.MediaListCollection.lists[0].entries;
 

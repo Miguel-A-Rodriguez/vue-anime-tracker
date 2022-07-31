@@ -3,7 +3,7 @@
 <template>
 
 
-<h1>FinishedAiring</h1>
+<h1 v-if="finishedAiringAnime">FinishedAiring</h1>
  <div id="component" class="finished-airing-container" v-for="(finishedAiringAnime, index) in finishedAiringAnimes" :key="index">
 
 
