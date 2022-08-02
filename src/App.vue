@@ -2,42 +2,34 @@
 
 <template>
 
-  <!-- // <FinishedAiringVue v-bind:usersData="usersData"/>
-  // : is shorthand for v-bind:
-  // note: when looping over the data in your child component, rename it to v-for="(list, entry) in movieEntries"
-  // also dont forget to add it to props in your child component like you have with props: ['usersData']
-  // props: {
-  //   usersData: {
-  //      type: Object
-  //   }
-  //      movieEntries: {
-  //        type: Object
-   //     }
-  // } -->
-
-
 
   <div class="header">
     <h3>Welcome {{userName}}</h3>
     Anime Schedule Tracker
-    <!-- <SearchBarVue /> -->
-
 
     <h6>Enter a Username to look at the anime they are watching!</h6>
     <form action="post" v-on:submit.prevent="fetchUserData">
 
-      <input type="text" v-model="searchUser">
+      <input ref="searchInput" type="text" v-model="searchUser" @keyup="searchTimeOut">
     </form>
 
   </div>
 
-    <div v-if="loadingState">
+  <div v-if="initialLoadingState">
+    <EpicSpinnersVue />
+  </div>
+  
+  <div v-if="searchLoadingState">
+    <CurrentlyAiringVue :currentlyAiringAnimes="currentlyAiringAnimes"  />
+  </div>
+
+  <div v-if="searchLoadingState">
+    <FinishedAiringVue :finishedAiringAnimes="finishedAiringAnimes" />
+  </div>
+
+   <div v-if="!searchLoadingState">
       <EpicSpinnersVue />
-    </div>
-  
-  
-  <CurrentlyAiringVue :currentlyAiringAnimes="currentlyAiringAnimes"  />
-  <FinishedAiringVue :finishedAiringAnimes="finishedAiringAnimes" />
+   </div>
   
 </template>
 
@@ -45,11 +37,6 @@
 import FinishedAiringVue from './components/FinishedAiring.vue';
 import CurrentlyAiringVue from './components/CurrentlyAiring.vue';
 import EpicSpinnersVue from './components/EpicSpinners.vue';
-
-
-// import SearchBarVue from './components/SearchBar.vue';
-
-
 
 let userStrings = "rockman239"
 
@@ -96,13 +83,12 @@ export default {
    FinishedAiringVue,
    CurrentlyAiringVue,
    EpicSpinnersVue
-
-  //  SearchBarVue
   },
 
   data (){
     return {
-      loadingState: true,
+      initialLoadingState: true,
+      searchLoadingState: true,
       finishedAiringAnimes: null,
       currentlyAiringAnimes: { },
       userName: null,
@@ -122,9 +108,7 @@ export default {
             'Accept': 'application/json',
           },
           body: JSON.stringify({
-            query: query,
-           
-           
+            query: query, 
             
       })
       }
@@ -132,12 +116,12 @@ export default {
       fetch(url, options)
       .then(this.handleResponse)
       .then(this.handleData)
-      .then(this.changeLoadingState) 
+      .then(this.changeinitialLoadingState) 
       .catch(this.handleError)
     },
   
 
-     handleResponse(response) {
+    handleResponse(response) {
        
       return response.json().then(function (json) {
         
@@ -149,27 +133,25 @@ export default {
   
 
       console.log(data)
-      const allAnimesArray = data.data.MediaListCollection.lists[0].entries;
-      
+      const allAnimesArray = data.data.MediaListCollection.lists[0].entries;     
 
       // checks if the "nextAiringEpisode" is null and then populates the array with those animes i.e only returns animes that have finished airing
       const doneAiringAnime = allAnimesArray.filter(item => Boolean(!item.media.nextAiringEpisode));
       this.finishedAiringAnimes = doneAiringAnime;
- 
 
        // checks if the "nextAiringEpisode" is true and then populates the array with those animes i.e only returns animes that are currently airing
       const currentlyAiringAnime = allAnimesArray.filter(item => Boolean(item.media.nextAiringEpisode));
       this.currentlyAiringAnimes = currentlyAiringAnime;
 
 
-      const names = data.data.MediaListCollection.user.name;
-      this.userName = names
-
+      const dataBaseNames = data.data.MediaListCollection.user.name;
+      console.log(dataBaseNames);
+      this.userName = dataBaseNames
 
     },
 
-    changeLoadingState(){
-      return this.loadingState = false;
+    changeinitialLoadingState(){
+      return this.initialLoadingState = false;
     },
 
      handleError(error) {
@@ -193,8 +175,6 @@ export default {
           body: JSON.stringify({
 
             query: this.handleQueryUpdate(),
-
-           
             
       })
       
@@ -203,9 +183,9 @@ export default {
       fetch(url, options)
       .then(this.handleUserResponse)
       .then(this.handleUserData) 
+      .then(this.showAnimeAfterApiCall)
       .catch(this.handleUserError)
     },
-  
     
     handleQueryUpdate() {
         let dynamicInput = this.searchUser
@@ -248,16 +228,31 @@ export default {
             return userNames
     },
 
+    searchTimeOut() {  
+      // if (this.searchUser.length <= 1) return;
+      console.log(this.searchUser.length)
+        if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+        }
+        this.timer = setTimeout(() => {
+          this.fetchUserData();
+           console.log("hi");
+        }, 1500);
+    },
+
      handleUserResponse(response) {
+      this.searchLoadingState = false;
+      console.log(this.searchLoadingState)
+
       return response.json().then(function (json) {
         return response.ok ? json : Promise.reject(json);
       });
     },
 
     handleUserData(data) {
+      console.log(this.searchUser.length);
       if (data.data.MediaListCollection.lists.length <= 0) return;
-     
-      
 
       const allAnimesArray = data.data.MediaListCollection.lists[0].entries;
 
@@ -274,22 +269,28 @@ export default {
       this.currentlyAiringAnimes = currentlyAiringAnime;
       
       const names = data.data.MediaListCollection.user.name;
+      
       this.userName = names
 
       console.log(this.searchData)
       console.log({userStrings})
+
+      
     },
 
-     handleUserError(error) {
+   
+
+    showAnimeAfterApiCall(){
+      this.searchLoadingState = true;
+      console.log(this.searchLoadingState)
+    },
+
+    handleUserError(error) {
       alert(error.errors[0].message);
       console.error(error);
     },
 
-  //Fetch the dynamic user data in the input tag
-
   },
-
-
 
 
   mounted() {

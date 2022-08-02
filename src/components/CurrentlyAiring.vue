@@ -1,32 +1,19 @@
 <template>
 
-  <!-- Need to make this Currently Airing Anime conditional on such anime existing -->
-  <!-- <h1 v-if="currentlyAiringAnimes === { }">Currently Airing</h1> -->
-
  <h1 v-if="Object.keys(currentlyAiringAnimes).length > 0"> Currently Airing Anime</h1>
 
  <div id="component" class="currently-airing-container" v-for="(currentlyAiringAnime, index) in currentlyAiringAnimes" :key="index">
-
-  <!-- <h1>{{currentlyAiringAnime.media.nextAiringEpisode.airingAt  ? "Currently Airing" : null}}</h1> -->
   <h2 class="black">{{ generateDayOfWeek(currentlyAiringAnime.media.nextAiringEpisode.airingAt) }}</h2>
-
   <div class="animation-container">
     <article class="current-anime">
       <a  target="_blank" :href="currentlyAiringAnime.media.siteUrl">
         <img :src=currentlyAiringAnime.media.coverImage.large alt="">
         <h3>{{ generateShortTitle(currentlyAiringAnime.media.title.romaji)}}</h3>
         <h4> {{ currentlyAiringAnime.progress }} / {{currentlyAiringAnime.media.episodes ? currentlyAiringAnime.media.episodes : "TBA"}}</h4>
-    
-    
        </a>
     </article>
   </div>
-
-      
-
  </div>
-
-
 
  </template>
 
@@ -37,17 +24,17 @@ export default {
  name: 'CurrentlyAiring',
 
 
-props: {
-    usersData: {
-       type: Object
-    },
-       currentlyAiringAnimes: {
-         type: Object
-       },
-          airingDays: {
-            type: Array
-          }
-},
+  props: {
+      usersData: {
+        type: Object
+      },
+        currentlyAiringAnimes: {
+          type: Object
+        },
+            airingDays: {
+              type: Array
+            }
+  },
 
 methods: {
 

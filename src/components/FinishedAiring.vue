@@ -3,11 +3,8 @@
 <template>
 
 
-<h1 v-if="finishedAiringAnime">FinishedAiring</h1>
+<h1 v-if="finishedAiringAnimes">FinishedAiring</h1>
  <div id="component" class="finished-airing-container" v-for="(finishedAiringAnime, index) in finishedAiringAnimes" :key="index">
-
-
-  
   <div class="animation-container">
     <article class="finished-anime">
       <a  target="_blank" :href="finishedAiringAnime.media.siteUrl">
@@ -15,46 +12,35 @@
       <h2>{{generateShortTitle(finishedAiringAnime.media.title.romaji) }}</h2>
       <h3> {{ finishedAiringAnime.progress}} / {{finishedAiringAnime.media.episodes}}</h3>
       </a>
-    
     </article>
   </div>
-
-
  </div>
-
-
-
  </template>
 
+
 <script>
-
-
 export default {
  name: 'FinishedAiring',
 
-//  props: ['usersData'],
+  props: {
+      usersData: {
+        type: Object
+      },
+        finishedAiringAnimes: {
+          type: Object
+        }
+  },
 
-props: {
-    usersData: {
-       type: Object
-    },
-       finishedAiringAnimes: {
-         type: Object
-       }
-},
+  methods: {
 
-methods: {
+    generateShortTitle(title){
+      const newTitle = title.slice(0, 23).concat("...")
+      return newTitle
+    }
 
-  
-  generateShortTitle(title){
-    const newTitle = title.slice(0, 23).concat("...")
-    return newTitle
-  }
-  
+  },
 
-},
-
- mounted() {
+  mounted() {
     
   },
 
@@ -63,10 +49,7 @@ methods: {
     window: () => window,
   },
 
-  
-
 }
-
 
 </script>
 
