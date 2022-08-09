@@ -93,7 +93,8 @@ export default {
       currentlyAiringAnimes: { },
       userName: null,
       searchUser: null,
-      searchData: null
+      searchData: null,
+      userNamesState: null
     }
   },
 
@@ -197,79 +198,46 @@ export default {
         let dynamicInput = this.searchUser
         userStrings = dynamicInput;
 
-        // const userNames = `
-        //     {
-        //     MediaListCollection(userName: "${userStrings}", type: ANIME) {
+        const userNames = `
+            {
+            MediaListCollection(userName: "${userStrings}", type: ANIME) {
             
-        //     lists {
-        //     entries {
-        //         id
-        //         progress
-        //         media{
-        //         episodes
-        //         title {
-        //         english
-        //         romaji
-        //         }
-        //         coverImage {
-        //             medium
-        //             large
-        //             color
-        //         }
-        //         nextAiringEpisode{
-        //                 airingAt
-        //                 }
-        //         siteUrl
-        //         }
-        //     }
-        //     }
-        //     user {
-        //     name
-        //     }
-
-        //     }
-
-        //     },
-        //     `;
-        //     return userNames
-
-
-          // Query to get every username matching the search input
-          // Must create a function that forces a popup menu that contains the mapped usernames from this specific query (debounce method*)
-          const userNames = `
-           query ( $page: Int, $perPage: Int, $search: String) {
-            Page (page: $page, perPage: $perPage) {
-              pageInfo {
-                total
-                currentPage
-                lastPage
-                hasNextPage
-                perPage
-              }
-
-
-                 users(search: $search ) {
-                  name
-                } 
+            lists {
+            entries {
+                id
+                progress
+                media{
+                episodes
+                title {
+                english
+                romaji
+                }
+                coverImage {
+                    medium
+                    large
+                    color
+                }
+                nextAiringEpisode{
+                        airingAt
+                        }
+                siteUrl
+                }
             }
-          }
+            }
+            user {
+            name
+            }
+
+            }
+
+            },
             `;
 
             return userNames
 
     },
 
-    searchTimeOut() {  
-        if (this.timer) {
-            clearTimeout(this.timer);
-            this.timer = null;
-        }
-        this.timer = setTimeout(() => {
-           if (this.searchUser.length <= 1) return;
-          this.fetchUserData();
-           console.log("hi");
-        }, 1500);
-    },
+    
 
      handleUserResponse(response) {
       this.searchLoadingState = false;
@@ -320,6 +288,92 @@ export default {
       alert(error.errors[0].message);
       console.error(error);
     },
+
+
+     fetchUserNames() {
+
+      var variables = {
+          search: this.searchUser,
+          page: 1,
+          perPage: 10
+      };
+      const url = 'https://graphql.anilist.co',
+      
+        options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+
+          body: JSON.stringify({
+
+            query: this.handleUserNamesQueryUpdate(),
+            variables: variables
+            
+      })
+      
+      }
+
+      fetch(url, options)
+      .then(this.handleUserNamesResponse)
+      .then(this.handleUserNamesData) 
+      .catch(this.handleUserError)
+    },
+
+    handleUserNamesResponse(response) {
+      
+      return response.json().then(function (json) {
+        console.log(json)
+        return response.ok ? json : Promise.reject(json);
+      });
+    },
+
+    handleUserNamesData(data){
+      console.log(data.data.Page.users)
+      let userNameData = data.data.Page.users;
+      this.userNamesState = userNameData;
+
+    },
+
+    handleUserNamesQueryUpdate() {
+          // Query to get every username matching the search input
+          // Must create a function that forces a popup menu that contains the mapped usernames from this specific query (debounce method*)
+          const userNames = `
+           query ( $page: Int, $perPage: Int, $search: String) {
+            Page (page: $page, perPage: $perPage) {
+              pageInfo {
+                total
+                currentPage
+                lastPage
+                hasNextPage
+                perPage
+              }
+
+
+                 users(search: $search ) {
+                  name
+                } 
+            }
+          }
+            `;
+
+            return userNames
+
+    },
+
+    searchTimeOut() {  
+        if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = null;
+        }
+        this.timer = setTimeout(() => {
+           if (this.searchUser.length <= 1) return;
+          this.fetchUserNames();
+           console.log("hi");
+        }, 1500);
+    },
+
 
   },
 
