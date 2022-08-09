@@ -4,7 +4,7 @@
 
 
   <div class="header">
-    <h3>Welcome {{userName}} !</h3>
+    <h3 v-if="userName">Welcome {{userName}} !</h3>
     Anime Schedule Tracker
 
     <h6>Enter a Username to look at the anime they are watching!</h6>
@@ -254,6 +254,9 @@ export default {
       console.log(this.searchUser.length);
       if (data.data.MediaListCollection.lists.length <= 0) return alert("This user has no anime please try another user");
 
+      this.userNamesStates = null;
+      this.searchUser = null;
+
       const allAnimesArray = data.data.MediaListCollection.lists[0].entries;
 
       this.searchData = allAnimesArray;
@@ -278,8 +281,7 @@ export default {
       console.log({userStrings})
 
       // Remove drop down input fields and clear the input field
-      this.userNamesStates = null;
-      this.searchUser = null;
+      
     },
 
    
