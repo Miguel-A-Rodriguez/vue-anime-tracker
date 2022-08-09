@@ -4,16 +4,16 @@
 
 
   <div class="header">
-    <h3>Welcome {{userName}}</h3>
+    <h3>Welcome {{userName}} !</h3>
     Anime Schedule Tracker
 
     <h6>Enter a Username to look at the anime they are watching!</h6>
     <form action="post" v-on:submit.prevent="fetchUserData">
 
-      <input ref="searchInput" type="text" v-model="searchUser" @keyup="searchTimeOut" >
+      <input ref="searchInput" type="text" v-model="searchUser" @keyup="searchTimeOut" @keyup.enter="fetchUserData()">
       <div v-if="userNamesStates" >
         <div v-for="(userNamesState, i) in userNamesStates" :key="i">
-           <input type="text"  v-model="userNamesStates[i]" v-on:click.prevent="handleInputValueChange(userNamesStates[i])" >
+           <input class="drop-down-box" type="text"  v-model="userNamesStates[i]" v-on:click.prevent="handleInputValueChange(userNamesStates[i])" @keyup.enter="fetchUserData()">
         </div>
       </div>
     </form>
@@ -170,11 +170,6 @@ export default {
    // Fetch the dynamic user data in the input tag
      fetchUserData() {
 
-      var variables = {
-          search: userStrings,
-          page: 1,
-          perPage: 10
-      };
       const url = 'https://graphql.anilist.co',
       
         options = {
@@ -187,7 +182,7 @@ export default {
           body: JSON.stringify({
 
             query: this.handleQueryUpdate(),
-            variables: variables
+         
             
       })
       
@@ -277,10 +272,14 @@ export default {
       
       this.userName = names
 
+      
+
       console.log(this.searchData)
       console.log({userStrings})
 
-      
+      // Remove drop down input fields and clear the input field
+      this.userNamesStates = null;
+      this.searchUser = null;
     },
 
    
@@ -301,7 +300,7 @@ export default {
       var variables = {
           search: this.searchUser,
           page: 1,
-          perPage: 10
+          perPage: 5
       };
       const url = 'https://graphql.anilist.co',
       
@@ -376,9 +375,9 @@ export default {
 
     handleInputValueChange(userName) {
       this.inputValueState = userName;
-      this.searchUser = this.inputValueState
+      this.searchUser = this.inputValueState;
       if(this.inputValueState != null) this.userNamesStates = false;
-      this.fetchUserData()
+      this.fetchUserData();
     },
 
     searchTimeOut() {  
@@ -387,10 +386,10 @@ export default {
             this.timer = null;
         }
         this.timer = setTimeout(() => {
-           if (this.searchUser.length <= 1) return;
+           if (this.searchUser.length <= 1) return this.userNamesStates = false;
           this.fetchUserNames();
            console.log("hi");
-        }, 300);
+        }, 1000);
     },
 
 
@@ -447,5 +446,9 @@ export default {
     max-width: 700px;
     min-height: 50px;
     font-size: 24px;
+  }
+  .drop-down-box{
+    position: relative;
+    z-index: 999;
   }
 </style>
