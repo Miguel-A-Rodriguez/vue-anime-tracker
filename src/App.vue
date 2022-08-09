@@ -10,7 +10,12 @@
     <h6>Enter a Username to look at the anime they are watching!</h6>
     <form action="post" v-on:submit.prevent="fetchUserData">
 
-      <input ref="searchInput" type="text" v-model="searchUser" @keyup="searchTimeOut">
+      <input ref="searchInput" type="text" v-model="searchUser" @keyup="searchTimeOut" >
+      <div v-if="userNamesStates" >
+        <div v-for="(userNamesState, i) in userNamesStates" :key="i">
+           <input type="text"  v-model="userNamesStates[i]" v-on:click.prevent="handleInputValueChange(userNamesStates[i])" >
+        </div>
+      </div>
     </form>
 
   </div>
@@ -94,7 +99,8 @@ export default {
       userName: null,
       searchUser: null,
       searchData: null,
-      userNamesState: null
+      userNamesStates: null,
+      inputValueState: null
     }
   },
 
@@ -251,7 +257,7 @@ export default {
 
     handleUserData(data) {
       console.log(this.searchUser.length);
-      if (data.data.MediaListCollection.lists.length <= 0) return;
+      if (data.data.MediaListCollection.lists.length <= 0) return alert("This user has no anime please try another user");
 
       const allAnimesArray = data.data.MediaListCollection.lists[0].entries;
 
@@ -330,9 +336,15 @@ export default {
     },
 
     handleUserNamesData(data){
-      console.log(data.data.Page.users)
       let userNameData = data.data.Page.users;
-      this.userNamesState = userNameData;
+      
+      let nameArray = userNameData.map(({name})=>{ 
+
+        return name
+
+      });
+      // this.userNamesStates = userNameData;
+      this.userNamesStates = nameArray
 
     },
 
@@ -362,6 +374,13 @@ export default {
 
     },
 
+    handleInputValueChange(userName) {
+      this.inputValueState = userName;
+      this.searchUser = this.inputValueState
+      if(this.inputValueState != null) this.userNamesStates = false;
+      this.fetchUserData()
+    },
+
     searchTimeOut() {  
         if (this.timer) {
             clearTimeout(this.timer);
@@ -371,8 +390,10 @@ export default {
            if (this.searchUser.length <= 1) return;
           this.fetchUserNames();
            console.log("hi");
-        }, 1500);
+        }, 300);
     },
+
+
 
 
   },
