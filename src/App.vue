@@ -4,16 +4,16 @@
 
 
   <div class="header">
-    <h3 v-if="userName">Welcome {{userName}} !</h3>
+    <h3 v-if="queriedUserName">Welcome {{queriedUserName}} !</h3>
     Anime Schedule Tracker
 
     <h6>Enter a Username to look at the anime they are watching!</h6>
-    <form action="post" v-on:submit.prevent="fetchUserData">
+    <form action="post" v-on:submit.prevent="fetchInputtedUserAnimeData">
 
-      <input ref="searchInput" type="text" v-model="searchUser" @keyup="searchTimeOut" @keyup.enter="fetchUserData()">
-      <div v-if="userNamesStates" >
-        <div v-for="(userNamesState, i) in userNamesStates" :key="i">
-           <input class="drop-down-box" type="text"  v-model="userNamesStates[i]" v-on:click.prevent="handleInputValueChange(userNamesStates[i])" @keyup.enter="fetchUserData()">
+      <input ref="searchInput" type="text" v-model="queriedUserState" @keyup="searchTimeOut" @keyup.enter="fetchInputtedUserAnimeData()">
+      <div v-if="userNamesState" >
+        <div v-for="(userNamesStat, i) in userNamesState" :key="i">
+           <input class="drop-down-box" type="text"  v-model="userNamesState[i]" v-on:click.prevent="handleInputValueChange(userNamesState[i])" @keyup.enter="fetchInputtedUserAnimeData()">
         </div>
       </div>
     </form>
@@ -45,7 +45,7 @@ import EpicSpinnersVue from './components/EpicSpinners.vue';
 
 let userStrings = "rockman239"
 
-const query = `
+const animeInfoQuery = `
 {
   MediaListCollection(userName: "${userStrings}", type: ANIME) {
   
@@ -96,16 +96,16 @@ export default {
       searchLoadingState: true,
       finishedAiringAnimes: null,
       currentlyAiringAnimes: { },
-      userName: null,
-      searchUser: null,
-      searchData: null,
-      userNamesStates: null,
+      queriedUserName: null,
+      queriedUserState: null,
+      searchedAnimeData: null,
+      userNamesState: null,
       inputValueState: null
     }
   },
 
   methods: {
-    fetchMovieData() {
+    fetchDefaultUserAnimes() {
       
       const url = 'https://graphql.anilist.co',
         options = {
@@ -115,7 +115,7 @@ export default {
             'Accept': 'application/json',
           },
           body: JSON.stringify({
-            query: query, 
+            query: animeInfoQuery, 
             
       })
       }
@@ -137,9 +137,6 @@ export default {
     },
 
     handleData(data) {
-  
-
-      console.log(data)
       const allAnimesArray = data.data.MediaListCollection.lists[0].entries;     
 
       // checks if the "nextAiringEpisode" is null and then populates the array with those animes i.e only returns animes that have finished airing
@@ -152,8 +149,7 @@ export default {
 
 
       const dataBaseNames = data.data.MediaListCollection.user.name;
-      console.log(dataBaseNames);
-      this.userName = dataBaseNames
+      this.queriedUserName = dataBaseNames
 
     },
 
@@ -168,7 +164,7 @@ export default {
 
 
    // Fetch the dynamic user data in the input tag
-     fetchUserData() {
+     fetchInputtedUserAnimeData() {
 
       const url = 'https://graphql.anilist.co',
       
@@ -196,10 +192,10 @@ export default {
     },
     
     handleQueryUpdate() {
-        let dynamicInput = this.searchUser
+        let dynamicInput = this.queriedUserState
         userStrings = dynamicInput;
 
-        const userNames = `
+        const dynamicUsersAnimeQuery = `
             {
             MediaListCollection(userName: "${userStrings}", type: ANIME) {
             
@@ -234,7 +230,7 @@ export default {
             },
             `;
 
-            return userNames
+            return dynamicUsersAnimeQuery
 
     },
 
@@ -242,24 +238,20 @@ export default {
 
      handleUserResponse(response) {
       this.searchLoadingState = false;
-      console.log(this.searchLoadingState)
-      
       return response.json().then(function (json) {
-        console.log(json)
         return response.ok ? json : Promise.reject(json);
       });
     },
 
     handleUserData(data) {
-      console.log(this.searchUser.length);
       if (data.data.MediaListCollection.lists.length <= 0) return alert("This user has no anime please try another user");
 
-      this.userNamesStates = null;
-      this.searchUser = null;
+      this.userNamesState = null;
+      this.queriedUserState = null;
 
       const allAnimesArray = data.data.MediaListCollection.lists[0].entries;
 
-      this.searchData = allAnimesArray;
+      this.searchedAnimeData = allAnimesArray;
 
       
      // checks if the "nextAiringEpisode" is null and then populates the array with those animes i.e only returns animes that have finished airing
@@ -271,39 +263,32 @@ export default {
       const currentlyAiringAnime = allAnimesArray.filter(item => Boolean(item.media.nextAiringEpisode));
       this.currentlyAiringAnimes = currentlyAiringAnime;
       
-      const names = data.data.MediaListCollection.user.name;
+      const searchedUserNamesFromDatabase = data.data.MediaListCollection.user.name;
       
-      this.userName = names
-
-      
-
-      console.log(this.searchData)
-      console.log({userStrings})
-
-      // Remove drop down input fields and clear the input field
+      this.queriedUserName = searchedUserNamesFromDatabase
       
     },
 
    
 
-    showAnimeAfterApiCall(){
-      this.searchLoadingState = true;
-      console.log(this.searchLoadingState)
-    },
+      showAnimeAfterApiCall(){
+        this.searchLoadingState = true;
+      },
 
-    handleUserError(error) {
-      alert(error.errors[0].message);
-      console.error(error);
-    },
+      handleUserError(error) {
+        alert(error.errors[0].message);
+        console.error(error);
+      },
 
 
      fetchUserNames() {
 
-      var variables = {
-          search: this.searchUser,
+      const variables = {
+          search: this.queriedUserState,
           page: 1,
           perPage: 5
       };
+
       const url = 'https://graphql.anilist.co',
       
         options = {
@@ -329,9 +314,7 @@ export default {
     },
 
     handleUserNamesResponse(response) {
-      
       return response.json().then(function (json) {
-        console.log(json)
         return response.ok ? json : Promise.reject(json);
       });
     },
@@ -344,15 +327,15 @@ export default {
         return name
 
       });
-      // this.userNamesStates = userNameData;
-      this.userNamesStates = nameArray
+
+      this.userNamesState = nameArray
 
     },
 
     handleUserNamesQueryUpdate() {
           // Query to get every username matching the search input
           // Must create a function that forces a popup menu that contains the mapped usernames from this specific query (debounce method*)
-          const userNames = `
+          const userNamesSearchQuery = `
            query ( $page: Int, $perPage: Int, $search: String) {
             Page (page: $page, perPage: $perPage) {
               pageInfo {
@@ -362,8 +345,6 @@ export default {
                 hasNextPage
                 perPage
               }
-
-
                  users(search: $search ) {
                   name
                 } 
@@ -371,15 +352,15 @@ export default {
           }
             `;
 
-            return userNames
+            return userNamesSearchQuery
 
     },
 
-    handleInputValueChange(userName) {
-      this.inputValueState = userName;
-      this.searchUser = this.inputValueState;
-      if(this.inputValueState != null) this.userNamesStates = false;
-      this.fetchUserData();
+    handleInputValueChange(clickedSuggestedUserName) {
+      this.inputValueState = clickedSuggestedUserName;
+      this.queriedUserState = this.inputValueState;
+      if(this.inputValueState != null) this.userNamesState = false;
+      this.fetchInputtedUserAnimeData();
     },
 
     searchTimeOut() {  
@@ -388,20 +369,16 @@ export default {
             this.timer = null;
         }
         this.timer = setTimeout(() => {
-           if (this.searchUser.length <= 1) return this.userNamesStates = false;
+           if (this.queriedUserState.length <= 1) return this.userNamesState = false;
           this.fetchUserNames();
-           console.log("hi");
-        }, 1000);
+           
+        }, 700);
     },
-
-
-
-
   },
 
 
   mounted() {
-    this.fetchMovieData();
+    this.fetchDefaultUserAnimes();
   }
 
 
