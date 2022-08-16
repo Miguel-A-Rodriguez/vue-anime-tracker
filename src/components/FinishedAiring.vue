@@ -111,17 +111,21 @@ export default {
              text-decoration: none;
            }
 
+          *,
+          body, html{
+              padding:0;
+              margin:0;
+          }
+
           h2,h3,h4.h5,h6{
             color: white;
             font-weight: bolder;
           }
+
           h1{
-            margin-bottom: 50px;
-          
-          }
-            h1{
-            margin-bottom: 50px;
-            font-size: 5vw;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 18px;
           }
             h2{
             font-size: 4vw;
@@ -136,11 +140,9 @@ export default {
             display: flex;
             max-width: 400px;
             display: inline-block;
-            margin: 0 10px;
+         
           }
-          /* .finished-airing-container:hover{
-            opacity: 70%;
-          } */
+ 
 
           .finished-anime{
             display: flex;
@@ -151,11 +153,9 @@ export default {
             border: 2px solid grey;
           }
           .finished-anime img{
-            min-width: 350px;
-            max-width: 350px;
-            max-height: 400px;
+            
           }
-              .animation-container{
+          .animation-container{
           transition: transform .2s; /* Animation */
           }
           .animation-container:hover{

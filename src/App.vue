@@ -5,7 +5,7 @@
 
   <div class="header">
     <h3 v-if="queriedUserName">Welcome {{queriedUserName}} !</h3>
-    Anime Schedule Tracker
+    <h4>Anime Schedule Tracker</h4>
 
     <h6>Enter a Username to look at the anime they are watching!</h6>
     <form action="post" v-on:submit.prevent="fetchInputtedUserAnimeData">
@@ -397,12 +397,16 @@ export default {
       color: #2c3e50;
       /* margin-top: 60px; */
 }
+body{
+  margin: 0;
+}
 </style>
 
 <style scoped>
-  .header{
+@media only screen and (min-width: 768px) {
+   .header{
     text-align: left;
-    font-size: 3vw;
+    font-size: 32px;
     background-color: #2b2d42;
     color: white;
     padding: 30px;
@@ -430,4 +434,57 @@ export default {
     position: relative;
     z-index: 999;
   }
+}
+
+ @media only screen and (max-width: 767px) {
+
+     body, html{
+              padding:0;
+              margin:0;
+     }
+
+     .header{
+      text-align: left;
+      background-color: #2b2d42;
+      color: white;
+      padding: 3vw;
+      margin-top: 0 !important;
+      width: 100%;
+     
+    }
+    .header h3 {
+      font-size: 6vw;
+      margin: 0;
+    }
+    .header h4 {
+      font-size: 5vw;
+      margin: 0;
+    }
+    .header h6{
+      font-size: 3.5vw;
+      word-break: break-all;
+      width: 37ch;
+      margin: 0;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    /* search input  */
+    form{
+      height: auto;
+      max-height: 100px;
+      /* padding-bottom: 20px; */
+    }
+    input {
+      max-width: 80%;
+      min-width: 80%;
+      min-height: 15px;
+      font-size: 24px;
+    }
+    .drop-down-box{
+      position: relative;
+      z-index: 999;
+    }
+   }
+ 
 </style>

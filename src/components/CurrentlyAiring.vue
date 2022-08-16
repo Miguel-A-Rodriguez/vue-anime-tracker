@@ -133,13 +133,19 @@ methods: {
       text-decoration: none;
     }
     
+    body, html{
+          padding:0;
+          margin:0;
+       }
+    
       h2,h3,h4,h5,h6{
         color: white;
         font-weight: bolder;
       }
         h1{
-        margin-bottom: 50px;
-        font-size: 5vw;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        font-size: 18px;
       }
         h2{
         font-size: 4vw;
@@ -152,28 +158,27 @@ methods: {
       }
       .currently-airing-container{
         display: flex;
-        max-width: 400px;
+        max-width: 320px;
         display: inline-block;
-        margin: 0 10px;
+        /* margin: 0 10px; */
       }
 
       .current-anime{
         display: flex;
         flex-direction: column;
         background: #dc3545;
-        max-width: 350px;
-        margin: 30px auto;
+        max-width: 320px;
+        margin: 0 auto;
         border: 2px solid #dc3545;
       }
     
       .current-anime img{
-        min-width: 350px;
-        max-width: 350px;
-        max-height: 400px;
+        
       }
-    .black{
-        color: black;
-      }
+      .black{
+          color: black;
+          font-size: 18px;
+        }
 
       .animation-container{
       transition: transform .2s; /* Animation */
