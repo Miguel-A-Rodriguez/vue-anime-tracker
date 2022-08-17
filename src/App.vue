@@ -450,6 +450,7 @@ body{
       padding: 3vw;
       margin-top: 0 !important;
       width: 100%;
+  
      
     }
     .header h3 {
@@ -478,8 +479,8 @@ body{
     input {
       max-width: 80%;
       min-width: 80%;
-      min-height: 15px;
-      font-size: 24px;
+      min-height: 10px;
+      font-size: 12px;
     }
     .drop-down-box{
       position: relative;

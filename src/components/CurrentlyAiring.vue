@@ -163,13 +163,13 @@ methods: {
 
       .flex-column-container {
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: space-around;
       }
       .currently-airing-container{
         display: flex;
         flex-direction: column;
         justify-content: center;
-        display: inline-block;
       }
       .currently-airing-container h2{
         margin-top: 30px;

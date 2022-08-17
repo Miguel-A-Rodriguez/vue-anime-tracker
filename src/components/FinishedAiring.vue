@@ -4,6 +4,8 @@
 
 
 <h1 v-if="finishedAiringAnimes">FinishedAiring</h1>
+
+<section class="flex-wrap-container">
  <div id="component" class="finished-airing-container" v-for="(finishedAiringAnime, index) in finishedAiringAnimes" :key="index">
   <div class="animation-container">
     <article class="finished-anime">
@@ -15,6 +17,7 @@
     </article>
   </div>
  </div>
+ </section>
  </template>
 
 
@@ -135,6 +138,12 @@ export default {
           }
             h4{
             font-size: 3vw;
+          }
+
+          .flex-wrap-container{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
           }
           .finished-airing-container{
             display: flex;
