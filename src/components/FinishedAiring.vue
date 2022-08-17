@@ -138,9 +138,7 @@ export default {
           }
           .finished-airing-container{
             display: flex;
-            max-width: 400px;
-            display: inline-block;
-         
+            justify-content: center;
           }
  
 
@@ -151,6 +149,10 @@ export default {
             max-width: 350px;
             margin: 30px auto;
             border: 2px solid grey;
+          }
+          .finished-anime h2, h3{
+            font-size: 16px;
+            margin: 5px 0;
           }
           .finished-anime img{
             

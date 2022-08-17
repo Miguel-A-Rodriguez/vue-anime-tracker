@@ -2,19 +2,22 @@
 
  <h1 v-if="Object.keys(currentlyAiringAnimes).length > 0"> Currently Airing Anime</h1>
 
+<section class="flex-column-container">
  <div id="component" class="currently-airing-container" v-for="(currentlyAiringAnime, index) in currentlyAiringAnimes" :key="index">
-  <h2 class="black">{{ generateDayOfWeek(currentlyAiringAnime.media.nextAiringEpisode.airingAt) }}</h2>
-  <div class="animation-container">
-    <article class="current-anime">
-      <a  target="_blank" :href="currentlyAiringAnime.media.siteUrl">
-        <img :src=currentlyAiringAnime.media.coverImage.large alt="">
-        <h3>{{ generateShortTitle(currentlyAiringAnime.media.title.romaji)}}</h3>
-        <h4> {{ currentlyAiringAnime.progress }} / {{currentlyAiringAnime.media.episodes ? currentlyAiringAnime.media.episodes : "TBA"}}</h4>
-       </a>
-    </article>
-  </div>
- </div>
+  
+    <h2 class="black">{{ generateDayOfWeek(currentlyAiringAnime.media.nextAiringEpisode.airingAt) }}</h2>
+    <div class="animation-container">
+      <article class="current-anime">
+        <a  target="_blank" :href="currentlyAiringAnime.media.siteUrl">
+          <img :src=currentlyAiringAnime.media.coverImage.large alt="">
+          <h3>{{ generateShortTitle(currentlyAiringAnime.media.title.romaji)}}</h3>
+          <h4> {{ currentlyAiringAnime.progress }} / {{currentlyAiringAnime.media.episodes ? currentlyAiringAnime.media.episodes : "TBA"}}</h4>
+         </a>
+      </article>
+    </div>
 
+ </div>
+</section>
  </template>
 
 <script>
@@ -141,6 +144,7 @@ methods: {
       h2,h3,h4,h5,h6{
         color: white;
         font-weight: bolder;
+        margin: 0;
       }
         h1{
         margin-top: 40px;
@@ -156,20 +160,33 @@ methods: {
         h4{
         font-size: 3vw;
       }
+
+      .flex-column-container {
+        display: flex;
+        flex-direction: column;
+      }
       .currently-airing-container{
         display: flex;
-        max-width: 320px;
+        flex-direction: column;
+        justify-content: center;
         display: inline-block;
-        /* margin: 0 10px; */
+      }
+      .currently-airing-container h2{
+        margin-top: 30px;
+        margin-bottom: 20px;
       }
 
       .current-anime{
         display: flex;
         flex-direction: column;
         background: #dc3545;
-        max-width: 320px;
+        max-width: 231px;
         margin: 0 auto;
         border: 2px solid #dc3545;
+      }
+      .current-anime h3, h4{
+        font-size: 16px;
+        margin: 5px 0;
       }
     
       .current-anime img{
