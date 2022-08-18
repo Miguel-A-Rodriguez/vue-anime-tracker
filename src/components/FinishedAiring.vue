@@ -120,24 +120,15 @@ export default {
               margin:0;
           }
 
-          h2,h3,h4.h5,h6{
-            color: white;
-            font-weight: bolder;
-          }
-
           h1{
             margin-top: 40px;
             margin-bottom: 20px;
             font-size: 18px;
           }
-            h2{
-            font-size: 4vw;
-          }
-            h3{
-            font-size: 3.5vw;
-          }
-            h4{
-            font-size: 3vw;
+
+          h2,h3,h4.h5,h6{
+            color: white;
+            font-weight: bolder;
           }
 
           .flex-wrap-container{
@@ -163,21 +154,13 @@ export default {
             font-size: 16px;
             margin: 5px 0;
           }
-          .finished-anime img{
-            
-          }
+
           .animation-container{
           transition: transform .2s; /* Animation */
           }
           .animation-container:hover{
           transform: scale(1.05); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
           }
-          p{
-            margin-bottom: 50px;
-            font-size: 6vw;
-            font-weight: bolder;
-            display: inline;
-           
-          }
+
      }
 </style>

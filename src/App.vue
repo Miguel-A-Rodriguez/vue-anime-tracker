@@ -8,12 +8,13 @@
     <h4>Anime Schedule Tracker</h4>
 
     <h6>Enter a Username to look at the anime they are watching!</h6>
-    <form action="post" v-on:submit.prevent="fetchInputtedUserAnimeData">
+    <form action="post" v-on:submit.prevent="fetchInputtedUserAnimeData" :disabled="alreadySubmittedState">
 
-      <input ref="searchInput" type="text" v-model="queriedUserState" @keyup="searchTimeOut" @keyup.enter="fetchInputtedUserAnimeData()">
+      <input ref="searchInput" type="text" v-model="queriedUserState" @keyup="searchTimeOut" @keyup.enter="fetchInputtedUserAnimeData()" >
       <div v-if="userNamesState" >
         <div v-for="(userNamesStat, i) in userNamesState" :key="i">
-           <input class="drop-down-box" type="text"  v-model="userNamesState[i]" v-on:click.prevent="handleInputValueChange(userNamesState[i])" @keyup.enter="fetchInputtedUserAnimeData()">
+           <input class="drop-down-box" type="text" 
+            v-model="userNamesState[i]" v-on:click.prevent="handleInputValueChange(userNamesState[i])" @keyup.enter="fetchInputtedUserAnimeData()">
         </div>
       </div>
     </form>
@@ -100,7 +101,8 @@ export default {
       queriedUserState: null,
       searchedAnimeData: null,
       userNamesState: null,
-      inputValueState: null
+      inputValueState: null,
+      alreadySubmittedState: null
     }
   },
 
@@ -183,11 +185,16 @@ export default {
       })
       
       }
-
+      
+      if (this.alreadySubmittedState === true) return
+       this.alreadySubmittedState = true;
       fetch(url, options)
       .then(this.handleUserResponse)
       .then(this.handleUserData) 
       .then(this.showAnimeAfterApiCall)
+      .then(this.setSubmittedStateTrue)
+      .then(this.setSubmittedStateFalse)
+      
       .catch(this.handleUserError)
     },
     
@@ -234,10 +241,16 @@ export default {
 
     },
 
-    
+    setSubmittedStateFalse(){
+      this.alreadySubmittedState = null;
+    },
+    setSubmittedStateTrue(){
+      this.alreadySubmittedState = true;
+    },
 
      handleUserResponse(response) {
       this.searchLoadingState = false;
+      console.log("Im querying")
       return response.json().then(function (json) {
         return response.ok ? json : Promise.reject(json);
       });
@@ -248,6 +261,7 @@ export default {
 
       this.userNamesState = null;
       this.queriedUserState = null;
+      this.alreadySubmittedState = true;
 
       const allAnimesArray = data.data.MediaListCollection.lists[0].entries;
 
@@ -273,7 +287,9 @@ export default {
 
       showAnimeAfterApiCall(){
         this.searchLoadingState = true;
+        
       },
+
 
       handleUserError(error) {
         alert(error.errors[0].message);
@@ -450,16 +466,16 @@ body{
       padding: 3vw;
       margin-top: 0 !important;
       width: 100%;
-  
-     
     }
     .header h3 {
       font-size: 6vw;
       margin: 0;
+      margin-top: 10px;
     }
     .header h4 {
       font-size: 5vw;
       margin: 0;
+      margin-top: 10px;
     }
     .header h6{
       font-size: 3.5vw;
@@ -474,7 +490,6 @@ body{
     form{
       height: auto;
       max-height: 100px;
-      /* padding-bottom: 20px; */
     }
     input {
       max-width: 80%;
