@@ -9,8 +9,7 @@
 
     <h6>Enter a Username to look at the anime they are watching!</h6>
     <form action="post" v-on:submit.prevent="fetchInputtedUserAnimeData" :disabled="alreadySubmittedState">
-
-      <input ref="searchInput" type="text" v-model="queriedUserState" @keyup="searchTimeOut" @keyup.enter="fetchInputtedUserAnimeData()" >
+      <input ref="searchInput" id="searchBar" type="text" v-model="queriedUserState" @keyup="searchTimeOut" @keyup.enter="fetchInputtedUserAnimeData()">
       <div v-if="userNamesState" >
         <div v-for="(userNamesStat, i) in userNamesState" :key="i">
            <input class="drop-down-box" type="text" 
@@ -196,6 +195,7 @@ export default {
       .then(this.setSubmittedStateFalse)
       
       .catch(this.handleUserError)
+      
     },
     
     handleQueryUpdate() {
@@ -250,6 +250,7 @@ export default {
 
      handleUserResponse(response) {
       this.searchLoadingState = false;
+      this.queriedUserState = "";
       console.log("Im querying")
       return response.json().then(function (json) {
         return response.ok ? json : Promise.reject(json);
@@ -257,8 +258,8 @@ export default {
     },
 
     handleUserData(data) {
-      if (data.data.MediaListCollection.lists.length <= 0) return alert("This user has no anime please try another user");
-
+      if (data.data.MediaListCollection.lists.length <= 0) alert("This user has no anime please try another user") ;
+      if (data.data.MediaListCollection.lists.length <= 0) return this.queriedUserState = this.inputValueState;
       this.userNamesState = null;
       this.queriedUserState = null;
       this.alreadySubmittedState = true;
@@ -292,8 +293,9 @@ export default {
 
 
       handleUserError(error) {
-        alert(error.errors[0].message);
+        window.location.reload()
         console.error(error);
+        alert(error.errors[0].message);
       },
 
 
@@ -380,14 +382,15 @@ export default {
     },
 
     searchTimeOut() {  
+      if ( this.queriedUserState.length === "") return 
         if (this.timer) {
             clearTimeout(this.timer);
             this.timer = null;
         }
+        if (this.queriedUserState === " ") return;
         this.timer = setTimeout(() => {
-           if (this.queriedUserState.length <= 1) return this.userNamesState = false;
+           if ( this.queriedUserState.length <= 1) return this.userNamesState = false;
           this.fetchUserNames();
-           
         }, 700);
     },
   },
