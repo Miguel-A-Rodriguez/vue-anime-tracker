@@ -9,7 +9,7 @@
 
     <h6>Enter a Username to look at the anime they are watching!</h6>
     <form action="post" v-on:submit.prevent="fetchInputtedUserAnimeData" :disabled="alreadySubmittedState">
-      <input ref="searchInput" id="searchBar" type="text" v-model="queriedUserState" @keyup="searchTimeOut" @keyup.enter="fetchInputtedUserAnimeData()">
+      <input ref="searchInput" id="searchBar" type="text" v-model="queriedUserState" @keyup="searchTimeOut" @keyup.enter="fetchInputtedUserAnimeData()" autocomplete="off">
       <div v-if="userNamesState" >
         <div v-for="(userNamesStat, i) in userNamesState" :key="i">
            <input class="drop-down-box" type="text" 
@@ -167,6 +167,7 @@ export default {
    // Fetch the dynamic user data in the input tag
      fetchInputtedUserAnimeData() {
 
+      this.userNamesState = false;
       const url = 'https://graphql.anilist.co',
       
         options = {
@@ -391,7 +392,7 @@ export default {
         this.timer = setTimeout(() => {
            if ( this.queriedUserState.length <= 1) return this.userNamesState = false;
           this.fetchUserNames();
-        }, 700);
+        }, 900);
     },
   },
 
